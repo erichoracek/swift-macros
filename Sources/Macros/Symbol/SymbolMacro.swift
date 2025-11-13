@@ -1,6 +1,11 @@
 import SwiftSyntaxMacros
 import SwiftSyntax
-import SwiftUI
+
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 struct SymbolMacro: ExpressionMacro {
   static func expansion(
@@ -23,8 +28,10 @@ struct SymbolMacro: ExpressionMacro {
   private static func verifySymbol(name: String) throws {
     #if canImport(UIKit)
     if let _ = UIImage(systemName: name) { return }
-    #else
+    #elseif canImport(AppKit)
     if let _ = NSImage(systemSymbolName: name, accessibilityDescription: nil) { return }
+    #else
+    fatalError("Not implemented!")
     #endif
     throw SymbolMacroError.invalidSymbol(name: name)
   }
